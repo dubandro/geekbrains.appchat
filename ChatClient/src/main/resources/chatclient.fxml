@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<VBox prefHeight="550.0" prefWidth="700.0" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="ru.geekbrains.dubovik.appchat.client.ChatController">
+    <MenuBar>
+        <Menu mnemonicParsing="false" text="MyChat">
+            <items>
+                <MenuItem mnemonicParsing="false" onAction="#signIn" text="Sign in" fx:id="menuSignIn"/>
+                <MenuItem mnemonicParsing="false" onAction="#signOut" text="Sign out" fx:id="menuSignOut" disable="true"/>
+                <MenuItem mnemonicParsing="false" onAction="#preferences" text="Preferences"/>
+                <SeparatorMenuItem mnemonicParsing="false"/>
+                <MenuItem mnemonicParsing="false" onAction="#quit" text="Quit MyChat"/>
+            </items>
+        </Menu>
+        <Menu mnemonicParsing="false" text="Edit">
+            <items>
+                <MenuItem mnemonicParsing="false" onAction="#delete" text="Delete all"/>
+            </items>
+        </Menu>
+        <Menu mnemonicParsing="false" text="Help">
+            <items>
+                <MenuItem mnemonicParsing="false" onAction="#help" text="Help"/>
+                <MenuItem mnemonicParsing="false" onAction="#about" text="About"/>
+            </items>
+        </Menu>
+    </MenuBar>
+    <HBox VBox.vgrow="ALWAYS">
+        <children>
+            <ListView fx:id="onlineUsers" minWidth="140" prefWidth="140.0" disable="true">
+                <HBox.margin>
+                    <Insets right="3.0"/>
+                </HBox.margin>
+            </ListView>
+            <VBox HBox.hgrow="ALWAYS">
+                <children>
+                    <TextArea fx:id="chatArea" editable="false" wrapText="true" VBox.vgrow="ALWAYS" focusTraversable="false">
+                        <VBox.margin>
+                            <Insets bottom="3.0"/>
+                        </VBox.margin>
+                    </TextArea>
+                    <HBox prefHeight="80.0">
+                        <children>
+                            <Button fx:id="btnAttachment" minHeight="80.0" minWidth="80.0" onAction="#btnAttach" focusTraversable="false">
+                                <graphic>
+                                    <ImageView fitHeight="70.0" fitWidth="70.0">
+                                        <image>
+                                            <Image url="/attachment.png"/>
+                                        </image>
+                                    </ImageView>
+                                </graphic>
+                            </Button>
+                            <TextArea fx:id="inputText" onKeyPressed="#pressEnter" focusTraversable="false"
+                                      promptText="press Shift+Enter to send" wrapText="true" HBox.hgrow="ALWAYS">
+                                <HBox.margin>
+                                    <Insets left="3.0" right="3.0"/>
+                                </HBox.margin>
+                            </TextArea>
+                            <Button fx:id="btnSendMessage" minHeight="80.0" minWidth="80.0" onAction="#btnSend" focusTraversable="false">
+                                <graphic>
+                                    <ImageView fitHeight="70.0" fitWidth="70.0">
+                                        <image>
+                                            <Image url="/email.png"/>
+                                        </image>
+                                    </ImageView>
+                                </graphic>
+                            </Button>
+                        </children>
+                    </HBox>
+                </children>
+            </VBox>
+        </children>
+        <VBox.margin>
+            <Insets bottom="3.0" left="3.0" right="3.0" top="3.0"/>
+        </VBox.margin>
+    </HBox>
+</VBox>
