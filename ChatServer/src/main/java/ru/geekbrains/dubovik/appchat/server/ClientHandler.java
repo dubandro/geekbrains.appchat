@@ -37,7 +37,7 @@ public class ClientHandler {
             this.outputStream = new DataOutputStream(socket.getOutputStream());
             this.handlerUserName = null;
             this.timer = null;
-            sendMessage(MessageType.SERVICE_MESSAGE, "onLine  —  authentication is required");
+            serverMessage(MessageType.SERVICE_MESSAGE, "onLine  —  Authentication is required");
             new Thread(() -> {
                 try {
                     while (!socket.isClosed()) readMessages();
@@ -86,22 +86,23 @@ public class ClientHandler {
         }
     }
 
-    public void sendMessage(MessageType type, String msg) {
+    public void serverMessage(MessageType type, String msg) {
         MessageDTO dto = new MessageDTO();
         dto.setMessageType(type);
         dto.setBody(msg);
+        dto.setFrom("server");
         sendMessage(dto);
     }
 
     private void userLogIn(MessageDTO dto) {
         String userName = chatServer.getAuthService().getUsernameByLoginPass(dto.getLogin(), dto.getPassword());
         if (userName == null || chatServer.isNickBusy(userName)) {
-            sendMessage(MessageType.ERROR_MESSAGE, "Incorrect Login or Password!");
+            serverMessage(MessageType.ERROR_MESSAGE, "Incorrect Login or Password");
             System.out.println("Authentication error");
         } else {
             handlerUserName = userName;
             timer.cancel();
-            sendMessage(MessageType.AUTH_ON_MESSAGE, handlerUserName);
+            serverMessage(MessageType.AUTH_ON_MESSAGE, handlerUserName);
             chatServer.subscribe(this);
         }
     }
@@ -109,7 +110,7 @@ public class ClientHandler {
     private void userLogOut() {
         // В обратном порядке относительно подключения
         chatServer.unsubscribe(this);
-        sendMessage(MessageType.AUTH_OFF_MESSAGE, "onLine  —  authentication is required");
+        serverMessage(MessageType.AUTH_OFF_MESSAGE, "onLine  —  Authentication is required");
         handlerUserName = null;
     }
 
@@ -148,7 +149,7 @@ class AuthTimeIsUp extends TimerTask {
     @Override
     public void run() {
         if (client.getName() == null) {
-            client.sendMessage(MessageType.SERVICE_MESSAGE, "offLine");
+            client.serverMessage(MessageType.SERVICE_MESSAGE, "offLine  —  Authentication timed out");
             client.CloseConnection();
         }
     }

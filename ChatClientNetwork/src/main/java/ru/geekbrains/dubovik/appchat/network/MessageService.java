@@ -1,7 +1,5 @@
 package ru.geekbrains.dubovik.appchat.network;
 
-import java.io.IOException;
-
 /**
  * Сервис работы с сообщениями по сети. Обрабатывает получение и отправку сообщений
  */

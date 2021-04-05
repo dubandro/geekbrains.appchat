@@ -42,6 +42,7 @@ public class ChatController implements Initializable, MessageProcessor {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        chatStatus("Connect to Server");
         menuSignIn.fire();
         refreshUserList();
     }
@@ -51,7 +52,7 @@ public class ChatController implements Initializable, MessageProcessor {
         else {
             if (!messageService.isConnected) messageService.connectToServer();
         }
-        AuthDialog.authStart(messageService, isAuthenticated);
+        if (messageService.isConnected) AuthDialog.authStart(messageService, isAuthenticated);
     }
 
     public void signOut(ActionEvent actionEvent) {
@@ -90,24 +91,26 @@ public class ChatController implements Initializable, MessageProcessor {
     }
 
     public void sendMessage() {
-        if (isAuthenticated) {
-            String msg = inputText.getText() + "\n";
-            if (msg.isBlank()) return;
-            msg = msg.replaceAll("[\\n]+","\n");
-            if (msg.lines().count() > 1) msg = "\n" + msg;
-            MessageDTO dto = new MessageDTO();
-            String selected = (String) onlineUsers.getSelectionModel().getSelectedItem();
-            if (selected.equals(ALL)) dto.setMessageType(MessageType.PUBLIC_MESSAGE);
-            else {
-                dto.setMessageType(MessageType.PRIVATE_MESSAGE);
-                dto.setTo(selected);
-                String myMsg = String.format("[me]  to  [%s]:  %s\n", selected, msg);
-                chatArea.appendText(myMsg);
-            }
-            dto.setBody(msg);
-            messageService.sendMessage(dto.convertToJson());
-            inputText.clear();
-        } else AlertDialog.showInform("Authentication is required!");
+        if (messageService.isConnected) {
+            if (isAuthenticated) {
+                String msg = inputText.getText() + "\n";
+                if (msg.isBlank()) return;
+                msg = msg.replaceAll("[\\n]+","\n");
+                if (msg.lines().count() > 1) msg = "\n" + msg;
+                MessageDTO dto = new MessageDTO();
+                String selected = (String) onlineUsers.getSelectionModel().getSelectedItem();
+                if (selected.equals(ALL)) dto.setMessageType(MessageType.PUBLIC_MESSAGE);
+                else {
+                    dto.setMessageType(MessageType.PRIVATE_MESSAGE);
+                    dto.setTo(selected);
+                    String myMsg = String.format("[me]  to  [%s]:  %s\n", selected, msg);
+                    chatArea.appendText(myMsg);
+                }
+                dto.setBody(msg);
+                messageService.sendMessage(dto.convertToJson());
+                inputText.clear();
+            } else AlertDialog.showInform("Authentication is required!");
+        }
     }
 
     private void showMessage(MessageDTO dto) {
@@ -128,6 +131,17 @@ public class ChatController implements Initializable, MessageProcessor {
         onlineUsers.setItems(FXCollections.observableArrayList(ALL));
     }
 
+    private void setAuthenticated(boolean auth) {
+        isAuthenticated = auth;
+        menuSignIn.setDisable(auth);
+        menuSignOut.setDisable(!auth);
+        onlineUsers.setDisable(!auth);
+    }
+
+    private void chatStatus(String status) {
+        ChatMainGUI.getStage().setTitle("My Chat  —  " + status);
+    }
+
     @Override
     public void processMessage(String msg) {
         Platform.runLater(() -> {
@@ -135,27 +149,34 @@ public class ChatController implements Initializable, MessageProcessor {
             switch (dto.getMessageType()) {
                 case PUBLIC_MESSAGE, PRIVATE_MESSAGE -> showMessage(dto);
                 case CLIENTS_LIST_MESSAGE -> refreshUserList(dto);
-                case ERROR_MESSAGE -> AlertDialog.showError(dto);
+                case ERROR_MESSAGE -> {
+                    AlertDialog.showError(dto.getBody());
+                    chatStatus(dto.getBody());
+                }
                 case AUTH_ON_MESSAGE -> {
-                    isAuthenticated = true;
-                    menuSignIn.setDisable(true);
-                    menuSignOut.setDisable(false);
-                    onlineUsers.setDisable(false);
+                    setAuthenticated(true);
                     chatArea.clear();
                     me = dto.getBody();
-                    ChatMainGUI.getStage().setTitle("My Chat  —  " + me);
+                    chatStatus(me);
                 }
                 case AUTH_OFF_MESSAGE -> {
-                    isAuthenticated = false;
-                    menuSignIn.setDisable(false);
-                    menuSignOut.setDisable(true);
-                    onlineUsers.setDisable(true);
+                    setAuthenticated(false);
                     me = null;
-                    ChatMainGUI.getStage().setTitle("My Chat  —  " + dto.getBody());
+                    chatStatus(dto.getBody());
                 }
                 case SERVICE_MESSAGE -> {
-                    ChatMainGUI.getStage().setTitle("My Chat  —  " + dto.getBody());
-                    if (dto.getBody().contains("offLine")) messageService.disconnectToServer();
+                    if (dto.getBody().contains("offLine")) {
+                        if (messageService.isConnected) {
+                            chatStatus(dto.getBody());
+                            setAuthenticated(false);
+                            me = null;
+                            messageService.disconnectToServer();
+                            if (dto.getFrom().equals("internal")) AlertDialog.showError(dto.getBody());
+                            if (dto.getFrom().equals("server")) AlertDialog.showInform(dto.getBody());
+                        }
+                    } else {
+                        chatStatus(dto.getBody());
+                    }
                 }
             }
         });

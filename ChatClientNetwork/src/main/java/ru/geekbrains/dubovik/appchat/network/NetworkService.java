@@ -1,5 +1,8 @@
 package ru.geekbrains.dubovik.appchat.network;
 
+import ru.geekbrains.dubovik.appchat.common.MessageDTO;
+import ru.geekbrains.dubovik.appchat.common.MessageType;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -14,14 +17,14 @@ public class NetworkService {
     private DataInputStream inputStream;
     private DataOutputStream outputStream;
     private Thread clientThread;
+    private final MessageService messageService;
 
     public NetworkService(String address, int port, MessageService messageService) {
-
+        this.messageService = messageService;
         try {
             this.socket = new Socket(address, port);
         } catch (IOException e) {
-//            AlertDialog.showError("Error: failed to connect, server not responding");
-            e.printStackTrace();
+            internalMessage(MessageType.ERROR_MESSAGE, "Failed to connect. Server not responding");
         }
 
         if (socket != null && socket.isConnected() && !socket.isClosed()) {
@@ -45,11 +48,8 @@ public class NetworkService {
                         e.printStackTrace();
                     }
                 } finally {
-                    if (messageService.isConnected) {
-                        System.out.println("Finally close connection");
-                        closeConnection();
-                        messageService.isConnected = false;
-                    }
+                    internalMessage(MessageType.SERVICE_MESSAGE, "offLine  —  Server not responding\n\n" +
+                            "Try connecting again later...");
                 }
             });
             clientThread.setDaemon(true);
@@ -85,5 +85,13 @@ public class NetworkService {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void internalMessage(MessageType type, String msg) {
+        MessageDTO dto = new MessageDTO();
+        dto.setMessageType(type);
+        dto.setBody(msg);
+        dto.setFrom("internal");
+        messageService.receiveMessage(dto.convertToJson());
     }
 }
