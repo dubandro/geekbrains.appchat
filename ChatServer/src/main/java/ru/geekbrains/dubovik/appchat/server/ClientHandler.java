@@ -17,7 +17,7 @@ import java.util.TimerTask;
  */
 
 public class ClientHandler {
-    private final long AUTH_TIME = 30_000;
+    private final long AUTH_TIME = 120_000;
     private final Socket socket;
     private final DataOutputStream outputStream;
     private final DataInputStream inputStream;
