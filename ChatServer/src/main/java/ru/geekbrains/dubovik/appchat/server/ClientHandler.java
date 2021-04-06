@@ -56,9 +56,20 @@ public class ClientHandler {
         timeForAuth();
     }
 
+    /**
+     * реализация задачи закрытия соединения по истечении определённого времени без аутентификации
+     */
     private void timeForAuth() {
         timer = new Timer();
-        timer.schedule(new AuthTimeIsUp(this), AUTH_TIME);
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (handlerUserName == null) {
+                    serverMessage(MessageType.SERVICE_MESSAGE, "offLine  —  Authentication timed out");
+                    CloseConnection();
+                }
+            }
+        }, AUTH_TIME);
     }
 
     private void readMessages() throws IOException {
@@ -131,26 +142,6 @@ public class ClientHandler {
             if (socket.isClosed()) System.out.println("Socket close, client disconnected");
         } catch (IOException e) {
             e.printStackTrace();
-        }
-    }
-}
-
-/**
- * реализация задачи закрытия соединения по истечении определённого времени
- * метод timeForAuth создаёт объект TimerTask, который отрабатывает закрытие соединения
- */
-class AuthTimeIsUp extends TimerTask {
-    ClientHandler client;
-
-    public AuthTimeIsUp(ClientHandler client) {
-        this.client = client;
-    }
-
-    @Override
-    public void run() {
-        if (client.getName() == null) {
-            client.serverMessage(MessageType.SERVICE_MESSAGE, "offLine  —  Authentication timed out");
-            client.CloseConnection();
         }
     }
 }
