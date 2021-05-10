@@ -79,12 +79,22 @@ public class ClientHandler {
         switch (dto.getMessageType()) {
             case PUBLIC_MESSAGE -> chatServer.broadcastMessage(dto);
             case PRIVATE_MESSAGE -> chatServer.privateMessage(dto);
+            case AUTH_CHANGE_NAME -> changeUserName(dto);
             case AUTH_ON_MESSAGE -> userLogIn(dto);
             case AUTH_OFF_MESSAGE -> {
                 userLogOut();
                 timeForAuth(); //должен быть здесь чтоб отрабатывал только при logout и не запускался при закрытии/отключении клиента
             }
         }
+    }
+
+    private void changeUserName(MessageDTO dto) {
+        if (chatServer.getAuthService().changeUserName(dto.getBody(), handlerUserName)) {
+            handlerUserName = dto.getBody();
+            serverMessage(MessageType.AUTH_CHANGE_NAME, handlerUserName);
+            chatServer.broadcastClientsOnline();
+        }
+        else serverMessage(MessageType.AUTH_CHANGE_NAME, "This NICK is busy");
     }
 
     public void sendMessage(MessageDTO dto) {

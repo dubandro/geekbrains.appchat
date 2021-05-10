@@ -39,6 +39,7 @@ public class ChatController implements Initializable, MessageProcessor {
     public Button btnAttachment;
     public MenuItem menuSignIn;
     public MenuItem menuSignOut;
+    public MenuItem menuAnonymous;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -60,6 +61,13 @@ public class ChatController implements Initializable, MessageProcessor {
     }
 
     public void preferences(ActionEvent actionEvent) {
+    }
+
+    public void anonymous(ActionEvent actionEvent) {
+        MessageDTO dto = new MessageDTO();
+        dto.setMessageType(MessageType.AUTH_CHANGE_NAME);
+        dto.setBody("@nonymous");
+        messageService.sendMessage(dto.convertToJson());
     }
 
     public void quit(ActionEvent actionEvent) {
@@ -135,6 +143,7 @@ public class ChatController implements Initializable, MessageProcessor {
         isAuthenticated = auth;
         menuSignIn.setDisable(auth);
         menuSignOut.setDisable(!auth);
+        menuAnonymous.setDisable(!auth);
         onlineUsers.setDisable(!auth);
     }
 
@@ -163,6 +172,15 @@ public class ChatController implements Initializable, MessageProcessor {
                     setAuthenticated(false);
                     me = null;
                     chatStatus(dto.getBody());
+                }
+                case AUTH_CHANGE_NAME -> {
+                    if (!dto.getBody().equals("This NICK is busy")) {
+                        me = dto.getBody();
+                        AlertDialog.showInform(me);
+                        chatStatus(me);
+                    } else {
+                        AlertDialog.showError(dto.getBody());
+                    }
                 }
                 case SERVICE_MESSAGE -> {
                     if (dto.getBody().contains("offLine")) {

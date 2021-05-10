@@ -4,6 +4,7 @@ import ru.geekbrains.dubovik.appchat.common.MessageDTO;
 import ru.geekbrains.dubovik.appchat.common.MessageType;
 import ru.geekbrains.dubovik.appchat.server.authentication.AuthService;
 import ru.geekbrains.dubovik.appchat.server.authentication.BaseAuthService;
+import ru.geekbrains.dubovik.appchat.server.authentication.JDBCAuthService;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -28,7 +29,11 @@ public class ChatServer {
     public ChatServer() {
         try (ServerSocket serverSocket = new ServerSocket(PORT)){
             System.out.println("Server started");
-            authService = new BaseAuthService();
+            /**
+             * здесь выбрать нужный сервис аутентификации
+             */
+//            authService = new BaseAuthService();
+            authService = new JDBCAuthService();
             authService.start();
             clientHandlerList = new LinkedList<>();
             while (true) {
