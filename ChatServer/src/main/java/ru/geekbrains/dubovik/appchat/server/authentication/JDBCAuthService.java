@@ -2,10 +2,6 @@ package ru.geekbrains.dubovik.appchat.server.authentication;
 
 import java.sql.*;
 
-/**
- * заглушка - доделаю в ближайшее время
- */
-
 public class JDBCAuthService implements AuthService{
     private static Connection connection;
     private static Statement statement;
