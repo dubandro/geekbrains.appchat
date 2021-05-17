@@ -1,0 +1,99 @@
+[PUBLIC_MESSAGE]  from  [1st@User]:  
+The Life of Greece
+The Story of Civilization, Volume 2
+Will Durant
+
+[PUBLIC_MESSAGE]  from  [1st@User]:  
+Our Oriental Heritage
+The Story of Civilization, Volume 1
+
+[PUBLIC_MESSAGE]  from  [1st@User]:  
+The Age of Napoleon
+A History of European Civilization from 1789 to 1815 (The Story of Civilization, Volume 11)
+
+[PUBLIC_MESSAGE]  from  [1st@User]:  
+Foundation
+Isaac Asimov
+
+[PUBLIC_MESSAGE]  from  [1st@User]:  
+The Player of Games
+Iain M. Banks
+
+[PUBLIC_MESSAGE]  from  [2st@User]:  
+Human Compatible
+Artificial Intelligence and the Problem of Control
+Stuart Russell
+
+[PUBLIC_MESSAGE]  from  [2st@User]:  
+Surface Detail
+Iain M. Banks
+May 01, 2011
+
+[PUBLIC_MESSAGE]  from  [2st@User]:  
+Das Kapital
+A Critque of Political Economy
+Karl Marx
+
+[PUBLIC_MESSAGE]  from  [2st@User]:  
+An Inquiry into the Nature and Causes of the Wealth of Nations
+Adam Smith
+
+[PUBLIC_MESSAGE]  from  [2st@User]:  
+A Dance with Dragons
+A Song of Ice and Fire
+George R. R. Martin
+
+[PUBLIC_MESSAGE]  from  [3st@User]:  
+A Clash of Kings
+A Song of Ice and Fire
+George R. R. Martin
+
+[PUBLIC_MESSAGE]  from  [3st@User]:  
+A Feast for Crows
+A Song of Ice and Fire (Game of Thrones)
+George R. R. Martin
+
+[PUBLIC_MESSAGE]  from  [3st@User]:  
+A Game of Thrones
+George R. R. Martin
+
+[PUBLIC_MESSAGE]  from  [3st@User]:  
+A Storm of Swords
+A Song of Ice and Fire
+George R. R. Martin
+
+[PUBLIC_MESSAGE]  from  [3st@User]:  
+If the Universe Is Teeming with Aliens ... WHERE IS EVERYBODY?
+Fifty Solutions to the Fermi Paradox and the Problem of Extraterrestrial Life
+
+[me]  to  [2st@User]:  
+Life 3.0
+Being Human in the Age of Artificial Intelligence
+
+[me]  to  [3st@User]:  
+The Lord of the Rings
+50th Anniversary, One Vol. Edition
+J.R.R. Tolkien
+
+[private_message]  from  [2st@User]:  
+Twelve Against the Gods
+The Story of Adventure
+William Bolitho
+
+[private_message]  from  [2st@User]:  
+The Big Picture
+On the Origins of Life, Meaning, and the Universe Itself
+Sean Carroll
+
+[PUBLIC_MESSAGE]  from  [3st@User]:  
+The Hitchhiker's Guide to the Galaxy
+Douglas Adams
+
+[private_message]  from  [3st@User]:  
+Waiting for Godot
+A Tragicomedy in Two Acts
+
+[private_message]  from  [3st@User]:  
+The Machine Stops
+E. M. Forster
+

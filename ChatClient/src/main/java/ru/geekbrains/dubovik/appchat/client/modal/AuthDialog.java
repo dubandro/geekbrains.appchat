@@ -6,6 +6,7 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.util.Pair;
+import ru.geekbrains.dubovik.appchat.client.ChatController;
 import ru.geekbrains.dubovik.appchat.common.MessageDTO;
 import ru.geekbrains.dubovik.appchat.common.MessageType;
 import ru.geekbrains.dubovik.appchat.network.MessageService;

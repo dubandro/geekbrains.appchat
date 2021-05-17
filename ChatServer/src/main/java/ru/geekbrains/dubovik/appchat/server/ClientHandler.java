@@ -115,15 +115,26 @@ public class ClientHandler {
         sendMessage(dto);
     }
 
+    public void serverMessage(MessageType type, String login, String msg) {
+        MessageDTO dto = new MessageDTO();
+        dto.setMessageType(type);
+        dto.setLogin(login);
+        dto.setBody(msg);
+        dto.setFrom("server");
+        sendMessage(dto);
+    }
+
     private void userLogIn(MessageDTO dto) {
-        String userName = chatServer.getAuthService().getUsernameByLoginPass(dto.getLogin(), dto.getPassword());
+        String login = dto.getLogin();
+        String password = dto.getPassword();
+        String userName = chatServer.getAuthService().getUsernameByLoginPass(login, password);
         if (userName == null || chatServer.isNickBusy(userName)) {
             serverMessage(MessageType.ERROR_MESSAGE, "Incorrect Login or Password");
             System.out.println("Authentication error");
         } else {
             handlerUserName = userName;
             timer.cancel();
-            serverMessage(MessageType.AUTH_ON_MESSAGE, handlerUserName);
+            serverMessage(MessageType.AUTH_ON_MESSAGE, login, handlerUserName);
             chatServer.subscribe(this);
         }
     }
