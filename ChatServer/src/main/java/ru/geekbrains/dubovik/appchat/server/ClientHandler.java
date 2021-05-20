@@ -38,22 +38,32 @@ public class ClientHandler {
             this.handlerUserName = null;
             this.timer = null;
             serverMessage(MessageType.SERVICE_MESSAGE, "onLine  —  Authentication is required");
-            new Thread(() -> {
-                try {
-                    while (!socket.isClosed()) readMessages();
-                } catch (Exception e) {
-                    if (!socket.isClosed()) e.printStackTrace();
-                } finally {
-                    if (!socket.isClosed()) {
-                        System.out.println("Finally close connection");
-                        CloseConnection();
-                    }
-                }
-            }).start();
+
+            /**
+             * Java. Уровень 3. Урок 4. Задание 2.
+             * На серверной стороне сетевого чата реализовать управление потоками через ExecutorService.
+             *
+             * Прежний запуск нового потока на сервере для клиента
+             * new Thread(() -> handlerChannel()).start();
+             */
+            chatServer.getExecutorService().execute(() -> handlerChannel());
         } catch (IOException e) {
             throw new RuntimeException("Something wrong with ClientHandler");
         }
         timeForAuth();
+    }
+
+    private void handlerChannel() {
+        try {
+            while (!socket.isClosed()) readMessages();
+        } catch (Exception e) {
+            if (!socket.isClosed()) e.printStackTrace();
+        } finally {
+            if (!socket.isClosed()) {
+                System.out.println("Finally close connection");
+                CloseConnection();
+            }
+        }
     }
 
     /**
