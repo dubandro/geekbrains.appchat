@@ -1,5 +1,7 @@
 package ru.geekbrains.dubovik.appchat.server;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.geekbrains.dubovik.appchat.common.MessageDTO;
 import ru.geekbrains.dubovik.appchat.common.MessageType;
 import ru.geekbrains.dubovik.appchat.server.authentication.AuthService;
@@ -11,7 +13,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -21,6 +22,7 @@ import java.util.concurrent.Executors;
  */
 
 public class ChatServer {
+    private static final Logger LOG = LogManager.getLogger(ChatServer.class.getName());
     private static final int PORT = 65500;
     private List<ClientHandler> clientHandlerList;
     private AuthService authService;
@@ -36,7 +38,7 @@ public class ChatServer {
 
     public ChatServer() {
         try (ServerSocket serverSocket = new ServerSocket(PORT)){
-            System.out.println("Server started");
+            LOG.trace("Server started");
             /**
              * Java. Уровень 3. Урок 2. Задание 1.
              * Добавить в сетевой чат авторизацию через базу данных SQLite
@@ -53,14 +55,13 @@ public class ChatServer {
              */
             executorService = Executors.newCachedThreadPool();
             while (true) {
-                System.out.println("Waiting new connection...");
+                LOG.trace("Waiting new connection...");
                 Socket socket = serverSocket.accept();
-                System.out.println("Client connected");
+                LOG.trace("Client connected");
                 new ClientHandler(this, socket);
             }
         } catch (IOException e) {
-            System.out.println("Server error");
-            e.printStackTrace();
+            LOG.error("Server error", e);
         } finally {
             if (executorService != null) {
                 executorService.shutdown();
@@ -109,12 +110,12 @@ public class ChatServer {
     public synchronized void subscribe(ClientHandler client) {
         clientHandlerList.add(client);
         broadcastClientsOnline();
-        System.out.println(client.getName() + " subscribed");
+        LOG.info("{} subscribed", client.getName());
     }
 
     public synchronized void unsubscribe(ClientHandler client) {
         clientHandlerList.remove(client);
         broadcastClientsOnline();
-        System.out.println(client.getName() + " unsubscribed");
+        LOG.info("{} unsubscribed", client.getName());
     }
 }

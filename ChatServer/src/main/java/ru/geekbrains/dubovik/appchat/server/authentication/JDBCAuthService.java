@@ -16,7 +16,7 @@ public class JDBCAuthService implements AuthService{
         try {
             connection = DriverManager.getConnection("jdbc:sqlite:ChatServer/src/main/resources/authbase.db");
             statement = connection.createStatement();
-            // Сервер напечатает зарегистрированных пользователей
+            // Сервер напечатает зарегистрированных пользователей в консоль как напоминалку
             registeredUsers();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -58,7 +58,6 @@ public class JDBCAuthService implements AuthService{
             ps.setString(1, login);
             ResultSet result = ps.executeQuery();
             if (result.getString("pass").equals(pass)) userName = result.getString("name");
-            System.out.println(userName + " authenticated");
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }

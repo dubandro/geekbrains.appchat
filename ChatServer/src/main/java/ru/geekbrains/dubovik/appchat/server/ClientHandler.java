@@ -1,5 +1,7 @@
 package ru.geekbrains.dubovik.appchat.server;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.geekbrains.dubovik.appchat.common.MessageDTO;
 import ru.geekbrains.dubovik.appchat.common.MessageType;
 
@@ -17,6 +19,7 @@ import java.util.TimerTask;
  */
 
 public class ClientHandler {
+    private static final Logger LOG = LogManager.getLogger(ClientHandler.class.getName());
     private final long AUTH_TIME = 120_000;
     private final Socket socket;
     private final DataOutputStream outputStream;
@@ -48,7 +51,8 @@ public class ClientHandler {
              */
             chatServer.getExecutorService().execute(() -> handlerChannel());
         } catch (IOException e) {
-            throw new RuntimeException("Something wrong with ClientHandler");
+            LOG.error("Something wrong with ClientHandler", e);
+            throw new RuntimeException(e);
         }
         timeForAuth();
     }
@@ -57,10 +61,10 @@ public class ClientHandler {
         try {
             while (!socket.isClosed()) readMessages();
         } catch (Exception e) {
-            if (!socket.isClosed()) e.printStackTrace();
+            if (!socket.isClosed()) LOG.error("Socket is closed", e);
         } finally {
             if (!socket.isClosed()) {
-                System.out.println("Finally close connection");
+                LOG.trace("Finally close connection");
                 CloseConnection();
             }
         }
@@ -113,7 +117,7 @@ public class ClientHandler {
                 outputStream.writeUTF(dto.convertToJson());
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.error("Can not send messages", e);
         }
     }
 
@@ -140,7 +144,7 @@ public class ClientHandler {
         String userName = chatServer.getAuthService().getUsernameByLoginPass(login, password);
         if (userName == null || chatServer.isNickBusy(userName)) {
             serverMessage(MessageType.ERROR_MESSAGE, "Incorrect Login or Password");
-            System.out.println("Authentication error");
+            LOG.warn("Authentication error");
         } else {
             handlerUserName = userName;
             timer.cancel();
@@ -161,18 +165,18 @@ public class ClientHandler {
         try {
             inputStream.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.error("inputStream->close", e);
         }
         try {
             outputStream.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.error("outputStream->close", e);
         }
         try {
             socket.close();
-            if (socket.isClosed()) System.out.println("Socket close, client disconnected");
+            if (socket.isClosed()) LOG.trace("Socket close, client disconnected");
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.error("socket->close", e);
         }
     }
 }
