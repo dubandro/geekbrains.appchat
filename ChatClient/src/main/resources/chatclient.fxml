@@ -14,6 +14,7 @@
                 <MenuItem mnemonicParsing="false" onAction="#signIn" text="Sign in" fx:id="menuSignIn"/>
                 <MenuItem mnemonicParsing="false" onAction="#signOut" text="Sign out" fx:id="menuSignOut" disable="true"/>
                 <MenuItem mnemonicParsing="false" onAction="#preferences" text="Preferences"/>
+                <MenuItem mnemonicParsing="false" onAction="#anonymous" text="Anonymous" fx:id="menuAnonymous" disable="true"/>
                 <SeparatorMenuItem mnemonicParsing="false"/>
                 <MenuItem mnemonicParsing="false" onAction="#quit" text="Quit MyChat"/>
             </items>

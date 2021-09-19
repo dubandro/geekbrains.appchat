@@ -19,7 +19,7 @@ import ru.geekbrains.dubovik.appchat.network.MessageService;
 import ru.geekbrains.dubovik.appchat.network.MessageProcessor;
 
 import java.awt.*;
-import java.io.IOException;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -30,6 +30,9 @@ public class ChatController implements Initializable, MessageProcessor {
     private boolean isAuthenticated;
     private MessageService messageService;
     private final String ALL = "PUBLIC ROOM";
+    private final int LINEHISTORY = 10;
+    private String historyFile;
+    private LocalHistory history;
 
     @FXML
     public ListView onlineUsers;
@@ -39,6 +42,7 @@ public class ChatController implements Initializable, MessageProcessor {
     public Button btnAttachment;
     public MenuItem menuSignIn;
     public MenuItem menuSignOut;
+    public MenuItem menuAnonymous;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -62,7 +66,14 @@ public class ChatController implements Initializable, MessageProcessor {
     public void preferences(ActionEvent actionEvent) {
     }
 
+    public void anonymous(ActionEvent actionEvent) {
+        //Сделано для проверки работы функции смены имени в базе данных TODO сделать полноценный gui
+        changeName("@nonymous");
+    }
+
     public void quit(ActionEvent actionEvent) {
+        history.closeLocalHistory();
+        messageService.disconnectToServer();
         Platform.exit();
     }
 
@@ -105,6 +116,7 @@ public class ChatController implements Initializable, MessageProcessor {
                     dto.setTo(selected);
                     String myMsg = String.format("[me]  to  [%s]:  %s\n", selected, msg);
                     chatArea.appendText(myMsg);
+                    writeHistory(myMsg);
                 }
                 dto.setBody(msg);
                 messageService.sendMessage(dto.convertToJson());
@@ -113,11 +125,19 @@ public class ChatController implements Initializable, MessageProcessor {
         }
     }
 
+    private void changeName(String newName) {
+        MessageDTO dto = new MessageDTO();
+        dto.setMessageType(MessageType.AUTH_CHANGE_NAME);
+        dto.setBody(newName);
+        messageService.sendMessage(dto.convertToJson());
+    }
+
     private void showMessage(MessageDTO dto) {
         String msgType= String.valueOf(dto.getMessageType());
         if (dto.getMessageType().equals(MessageType.PRIVATE_MESSAGE)) msgType = msgType.toLowerCase();
         String msg = String.format("[%s]  from  [%s]:  %s\n", msgType, dto.getFrom(), dto.getBody());
         chatArea.appendText(msg);
+        writeHistory(msg);
     }
 
     private void refreshUserList(MessageDTO dto) {
@@ -135,6 +155,7 @@ public class ChatController implements Initializable, MessageProcessor {
         isAuthenticated = auth;
         menuSignIn.setDisable(auth);
         menuSignOut.setDisable(!auth);
+        menuAnonymous.setDisable(!auth);
         onlineUsers.setDisable(!auth);
     }
 
@@ -158,14 +179,26 @@ public class ChatController implements Initializable, MessageProcessor {
                     chatArea.clear();
                     me = dto.getBody();
                     chatStatus(me);
+                    localHistory(dto.getLogin());
                 }
                 case AUTH_OFF_MESSAGE -> {
                     setAuthenticated(false);
                     me = null;
                     chatStatus(dto.getBody());
+                    history.closeLocalHistory();
+                }
+                case AUTH_CHANGE_NAME -> {
+                    if (!dto.getBody().equals("This NICK is busy")) {
+                        me = dto.getBody();
+                        AlertDialog.showInform(me);
+                        chatStatus(me);
+                    } else {
+                        AlertDialog.showError(dto.getBody());
+                    }
                 }
                 case SERVICE_MESSAGE -> {
                     if (dto.getBody().contains("offLine")) {
+                        history.closeLocalHistory();
                         if (messageService.isConnected) {
                             chatStatus(dto.getBody());
                             setAuthenticated(false);
@@ -180,5 +213,18 @@ public class ChatController implements Initializable, MessageProcessor {
                 }
             }
         });
+    }
+
+    private void localHistory(String me) {
+        historyFile = "ChatClient/src/main/localhistory/history_" + me + ".txt";
+        history = new LocalHistory(historyFile);
+        String[] arrHistory = history.readHistory(LINEHISTORY);
+        for(String line : arrHistory) {
+            chatArea.appendText(line + "\n");
+        }
+    }
+
+    private void writeHistory(String msg) {
+        history.writeHistory(msg);
     }
 }

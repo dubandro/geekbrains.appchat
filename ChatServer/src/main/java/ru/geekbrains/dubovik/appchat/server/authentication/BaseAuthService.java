@@ -39,4 +39,9 @@ public class BaseAuthService implements AuthService{
         }
         return null;
     }
+
+    @Override
+    public boolean changeUserName(String newName, String oldName) {
+        return false;
+    }
 }
